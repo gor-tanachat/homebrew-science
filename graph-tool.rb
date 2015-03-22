@@ -52,6 +52,8 @@ class GraphTool < Formula
   def install
     ENV.cxx11
 
+    system "./autogen.sh" if build.head?
+
     config_args = %W(
       --disable-debug
       --disable-dependency-tracking
@@ -71,7 +73,6 @@ class GraphTool < Formula
     config_args << "--disable-cairo" if build.without? "cairo"
     config_args << "--disable-sparsehash" if build.without? "google-sparsehash"
 
-    system "./autogen.sh" if build.head?
     inreplace "configure", "libboost_python", "libboost_python3" if build.with? "python3"
     system "./configure", "PYTHON_EXTRA_LDFLAGS= ", *config_args
     system "make", "install"
