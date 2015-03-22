@@ -85,6 +85,6 @@ class GraphTool < Formula
       v2 = g.add_vertex()
       e = g.add_edge(v1, v2)
     EOS
-    Language::Python.each_python(build) { |python, _version| system python, "test.py" }
+    Language::Python.each_python(build) { |python, _| system python, "test.py" }
   end
 end
