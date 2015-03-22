@@ -61,19 +61,16 @@ class GraphTool < Formula
       --prefix=#{prefix}
     )
 
-    if build.with? "python3"
-      xy = Language::Python.major_minor_version "python3"
-      config_args << "PYTHON=python3"
-      config_args << "LDFLAGS=-L#{`python3-config --prefix`.chomp}/lib"
-      config_args << "--with-python-module-path=#{lib}/python#{xy}/site-packages"
-    else
-      config_args << "--with-python-module-path=#{lib}/python2.7/site-packages"
-    end
-
     config_args << "--disable-cairo" if build.without? "cairo"
     config_args << "--disable-sparsehash" if build.without? "google-sparsehash"
 
     Language::Python.each_python(build) do |python, version|
+      config_args_x = ["PYTHON=#{python}"]
+      config_args_x << "CFLAGS=#{`#{python}-config --cflags`.chomp}"
+      config_args_x << "LDFLAGS=#{`#{python}-config --ldflags`.chomp}"
+      config_args_x << "LIBS=#{`#{python}-config --libs`.chomp}"
+      config_args_x << "--with-python-module-path=#{lib}/python#{version}/site-packages"
+
       begin
         if version.to_s.start_with?("3")
           inreplace "configure", "libboost_python", "libboost_python3"
