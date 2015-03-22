@@ -74,8 +74,12 @@ class GraphTool < Formula
     config_args << "--disable-sparsehash" if build.without? "google-sparsehash"
 
     inreplace "configure", "libboost_python", "libboost_python3" if build.with? "python3"
-    system "./configure", "PYTHON_EXTRA_LDFLAGS= ", *config_args
-    system "make", "install"
+    Language::Python.each_python(build) do |python, version|
+      mkdir "build-#{python}-#{version}" do
+        system "../configure", "PYTHON_EXTRA_LDFLAGS= ", *config_args, *config_args_x
+        system "make", "install"
+      end
+    end
   end
 
   test do
