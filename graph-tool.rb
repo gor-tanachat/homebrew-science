@@ -73,8 +73,18 @@ class GraphTool < Formula
     config_args << "--disable-cairo" if build.without? "cairo"
     config_args << "--disable-sparsehash" if build.without? "google-sparsehash"
 
-    inreplace "configure", "libboost_python", "libboost_python3" if build.with? "python3"
     Language::Python.each_python(build) do |python, version|
+      begin
+        if version.to_s.start_with?("3")
+          inreplace "configure", "libboost_python", "libboost_python3"
+        elsif version.to_s.start_with?("2")
+          inreplace "configure", "libboost_python3", "libboost_python"
+        else
+          opoo "Python version not recognized"
+        end
+      rescue Utils::InreplaceError
+      end
+
       mkdir "build-#{python}-#{version}" do
         system "../configure", "PYTHON_EXTRA_LDFLAGS= ", *config_args, *config_args_x
         system "make", "install"
