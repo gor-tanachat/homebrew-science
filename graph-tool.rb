@@ -67,15 +67,8 @@ class GraphTool < Formula
       config_args_x << "PYTHON_EXTRA_LDFLAGS=#{`#{python}-config --ldflags`.chomp}1"
       config_args_x << "--with-python-module-path=#{lib}/python#{version}/site-packages"
 
-      begin
-        if version.to_s.start_with?("3")
-          inreplace "configure", "libboost_python", "libboost_python3"
-        elsif version.to_s.start_with?("2")
-          inreplace "configure", "libboost_python3", "libboost_python"
-        else
-          opoo "Python version not recognized"
-        end
-      rescue Utils::InreplaceError
+      if python == "python3"
+        inreplace "configure", "libboost_python", "libboost_python3"
       end
 
       mkdir "build-#{python}-#{version}" do
