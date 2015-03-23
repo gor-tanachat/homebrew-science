@@ -64,7 +64,9 @@ class GraphTool < Formula
 
     Language::Python.each_python(build) do |python, version|
       config_args_x = ["PYTHON=#{python}"]
-      config_args_x << "PYTHON_EXTRA_LDFLAGS=#{`#{python}-config --ldflags`.chomp}1"
+      config_args_x << "CFLAGS=#{`#{python}-config --cflags`.chomp}"
+      config_args_x << "LDFLAGS=#{`#{python}-config --ldflags`.chomp}"
+      config_args_x << "LIBS=#{`#{python}-config --libs`.chomp}"
       config_args_x << "--with-python-module-path=#{lib}/python#{version}/site-packages"
 
       if python == "python3"
@@ -72,7 +74,7 @@ class GraphTool < Formula
       end
 
       mkdir "build-#{python}-#{version}" do
-        system "../configure", *(config_args + config_args_x)
+        system "../configure", "PYTHON_EXTRA_LDFLAGS= ", *config_args, *config_args_x
         system "make", "install"
       end
     end
