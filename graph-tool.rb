@@ -15,7 +15,7 @@ class GraphTool < Formula
   option "with-gtk+3", "Build with gtk+3 support for interactive plotting"
 
   cxx11 = MacOS.version < :mavericks ? ["c++11"] : []
-  tags = []
+  with_pythons = build.with?("python3") ? ["with-python3"] : []
 
   depends_on "pkg-config" => :build
   depends_on "boost" => cxx11
@@ -25,10 +25,12 @@ class GraphTool < Formula
   depends_on "gtk+3" => :optional
   depends_on :python => :recommended
   depends_on :python3 => :optional
+  depends_on "boost-python" => cxx11 + with_pythons
 
   if build.with? "gtk+3"
     depends_on "gnome-icon-theme"
     depends_on "librsvg" => "with-gtk+3"
+    depends_on "pygobject3" => with_pythons
   end
 
   if build.with? "python"
@@ -43,11 +45,7 @@ class GraphTool < Formula
     depends_on "matplotlib" => :python3
     depends_on "numpy" => :python3
     depends_on "scipy" => :python3
-    tags << "with-python3"
   end
-
-  depends_on "boost-python" => cxx11 + tags
-  depends_on "pygobject3" => tags if build.with? "gtk+3"
 
   def install
     ENV.cxx11
